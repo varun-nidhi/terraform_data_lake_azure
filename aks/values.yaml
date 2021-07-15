@@ -1,0 +1,36 @@
+web:
+  extraVolumeMounts:
+    - name: requirements
+      mountPath: /bitnami/python/
+## Add extra volumes
+  extraVolumes:
+    - name: requirements
+      configMap:
+      # Provide the name of the ConfigMap containing the files you want
+      # to add to the container
+        name: requirements
+
+scheduler:
+  extraVolumeMounts:
+    - name: requirements
+      mountPath: /bitnami/python/
+  ## Add extra volumes
+  extraVolumes:
+    - name: requirements
+      configMap:
+        # Provide the name of the ConfigMap containing the files you want
+        # to add to the container
+        name: requirements
+
+
+worker:
+  extraVolumeMounts:
+    - name: requirements
+      mountPath: /bitnami/python/
+  ## Add extra volumes
+  extraVolumes:
+    - name: requirements
+      configMap:
+        # Provide the name of the ConfigMap containing the files you want
+        # to add to the container
+        name: requirements

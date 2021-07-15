@@ -38,7 +38,7 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "this" {
-  name     = "myrg"
+  name     = "myrg2"
   location = "North Central US"
 }
 
@@ -131,3 +131,27 @@ resource "databricks_azure_adls_gen2_mount" "this" {
   client_secret_key      = databricks_secret.this.key
   initialize_file_system = true
 }
+//
+//provider "databricks" {
+//  alias = "created_workspace"
+//
+//  host  = azurerm_databricks_workspace.this.workspace_url
+//}
+//
+//resource "azurerm_role_assignment" "this-workspace" {
+//  scope                = azurerm_databricks_workspace.this.id
+//  role_definition_name = "Owner"
+//  principal_id         = data.azurerm_client_config.current.object_id
+//}
+//
+//
+//resource "databricks_token" "pat" {
+//  provider = databricks.created_workspace
+//  comment  = "Terraform Provisioning"
+//  // 100 day token
+//  lifetime_seconds = 8640000
+//}
+//
+//output "databricks_token" {
+//  value     = databricks_token.pat.token_value
+//}

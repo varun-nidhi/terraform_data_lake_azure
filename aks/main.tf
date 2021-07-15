@@ -62,13 +62,13 @@ resource "azurerm_kubernetes_cluster" "example" {
   }
 }
 
-output "client_certificate" {
-  value = azurerm_kubernetes_cluster.example.kube_config.0.client_certificate
-}
-
-output "kube_config" {
-  value = azurerm_kubernetes_cluster.example.kube_config_raw
-}
+//output "client_certificate" {
+//  value = azurerm_kubernetes_cluster.example.kube_config.0.client_certificate
+//}
+//
+//output "kube_config" {
+//  value = azurerm_kubernetes_cluster.example.kube_config_raw
+//}
 
 
 resource "azurerm_postgresql_server" "example" {
@@ -122,23 +122,6 @@ resource "azurerm_redis_cache" "example" {
   }
 }
 
-//data "azurerm_redis_cache" "example" {
-//  name = "example-cache-varun30"
-//  resource_group_name = azurerm_resource_group.this.name
-//}
-////
-////output "primary_access_key" {
-////  value = data.azurerm_redis_cache.example.primary_access_key
-////}
-////
-////output "hostname" {
-////  value = data.azurerm_redis_cache.example.hostname
-////}
-
-//data "azurerm_kubernetes_cluster" "example" {
-//  name = "example-aks1"
-//  resource_group_name = azurerm_resource_group.this.name
-//}
 
 provider "helm" {
   kubernetes {
@@ -158,7 +141,12 @@ resource "helm_release" "airflow" {
 
   repository = "https://charts.bitnami.com/bitnami"
   chart = "airflow"
-
+  values = [
+    file("values.yaml")]
+  set{
+   name = "dagsConfigMap"
+    value = kubernetes_config_map.dags.metadata.0.name
+  }
   set {
     name = "service.type"
     value = "LoadBalancer"
@@ -193,7 +181,7 @@ resource "helm_release" "airflow" {
   }
   set {
     name = "externalDatabase.user"
-    value = "psqladminun@postgresql-server-2-varun30"
+    value = "psqladminun@${azurerm_postgresql_server.example.name}"
   }
   set {
     name = "externalDatabase.database"
@@ -219,14 +207,7 @@ resource "helm_release" "airflow" {
     name = "externalRedis.password"
     value = azurerm_redis_cache.example.primary_access_key
   }
-//  set {
-//    name = "airflow.auth.password"
-//    value = "password"
-//  }
-//  set {
-//    name = "airflow.auth.username"
-//    value = "admin"
-//  }
+
    set {
     name = "auth.password"
     value = "password"
@@ -240,4 +221,37 @@ resource "helm_release" "airflow" {
     value = "kHDkzuRlXIEdyTwOXiOuGlSokCfoLupuykHTDI2IOco="
   }
 
+}
+
+provider "kubernetes" {
+  alias = "existing"
+  host = azurerm_kubernetes_cluster.example.kube_config.0.host
+  client_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_certificate)
+  client_key = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)
+}
+
+
+resource "kubernetes_config_map" "this" {
+  provider = kubernetes.existing
+  metadata {
+    name = "requirements"
+  }
+
+  data = {
+
+    "requirements.txt" = file("requirements.txt")
+  }
+}
+
+resource "kubernetes_config_map" "dags" {
+  provider = kubernetes.existing
+  metadata {
+    name = "dags"
+  }
+
+  data = {
+
+    "databricks.py" = file("databricks.py")
+  }
 }
