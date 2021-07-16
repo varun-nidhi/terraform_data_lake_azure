@@ -109,10 +109,10 @@ resource "azurerm_postgresql_database" "example" {
 
 # NOTE: the Name used for Redis needs to be globally unique
 resource "azurerm_redis_cache" "example" {
-  name = "example-cache-varun30"
+  name = "example-cache-varun301986"
   location = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
-  capacity = 2
+  capacity = 1
   family = "C"
   sku_name = "Standard"
   enable_non_ssl_port = true
@@ -137,7 +137,7 @@ provider "helm" {
 
 
 resource "helm_release" "airflow" {
-  name = "airflow-aks6"
+  name = "airflow-aks11"
 
   repository = "https://charts.bitnami.com/bitnami"
   chart = "airflow"
@@ -253,5 +253,6 @@ resource "kubernetes_config_map" "dags" {
   data = {
 
     "databricks.py" = file("databricks.py")
+    "databricks1.py" = file("databricks1.py")
   }
 }
