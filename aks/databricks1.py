@@ -28,14 +28,14 @@ with DAG(
     }
 
     spark_new_cluster = DatabricksSubmitRunOperator(task_id='spark_new_cluster', new_cluster=new_cluster,
-                                                    spark_jar_task={'main_class_name': 'wtf.Job2'},
+                                                    spark_jar_task={'main_class_name': 'foo.Job2'},
                                                     libraries=[
                                                         {'jar': 'dbfs:/mnt/data/core/lib/scala_seed-1.0-SNAPSHOT.jar'}])
 
     spark_jar_task_all_use_cluster = DatabricksSubmitRunOperator(
         task_id='spark_jar_task_all_use_cluster',
         existing_cluster_id="0716-061358-bid810",
-        spark_jar_task={'main_class_name': 'wtf.Job2'},
+        spark_jar_task={'main_class_name': 'foo.Job2'},
         libraries=[{'jar': 'dbfs:/mnt/data/core/lib/scala_seed-1.0-SNAPSHOT.jar'}],
     )
 
